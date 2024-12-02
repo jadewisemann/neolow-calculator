@@ -81,7 +81,7 @@ body * {
   overflow: hidden;
 }
 
-.calc-result {
+#calc-result, #calc-equation {
   overflow-wrap:break-word ;
   user-select: none;
   color: white;

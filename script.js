@@ -1,12 +1,13 @@
-let display = document.getElementById("calc-result"),
-  currentInput = "",
-  operator = "",
-  previousInput = "";
+let displayEquation = document.getElementById("calc-equation");
+let displayResult = document.getElementById("calc-result");
 
-const buttons = document.querySelectorAll(".calc-button");
+let currentInput = "";
+let operator = "";
+let previousInput = "";
 
-const updateDisplay = (value) => {
-  display.textContent = value || "0";
+const updateDisplays = () => {
+  displayEquation.textContent = `${previousInput || ""} ${operator || ""} ${currentInput || ""}`.trim() || "0";
+  displayResult.textContent = currentInput || "0";
 };
 
 const calculate = (a, b, operator) => {
@@ -32,17 +33,19 @@ const actions = {
     currentInput = "";
     previousInput = "";
     operator = "";
-    updateDisplay("0");
+    updateDisplays();
   },
   "=": () => {
     if (operator && previousInput && currentInput) {
       currentInput = calculate(previousInput, currentInput, operator);
       previousInput = "";
       operator = "";
+      updateDisplays();
     }
   },
   del: () => {
     currentInput = currentInput.length > 1 ? currentInput.slice(0, -1) : "";
+    updateDisplays();
   },
   operator: (value) => {
     if (currentInput) {
@@ -53,12 +56,16 @@ const actions = {
       }
       currentInput = "";
       operator = value;
+      updateDisplays();
     }
   },
   default: (value) => {
     currentInput = currentInput === "0" ? value : currentInput + value;
+    updateDisplays();
   },
 };
+
+const buttons = document.querySelectorAll(".calc-button");
 
 buttons.forEach((button) => {
   button.addEventListener("click", () => {
@@ -71,7 +78,5 @@ buttons.forEach((button) => {
     } else {
       actions.default(value);
     }
-
-    updateDisplay(currentInput || previousInput || "0");
   });
 });
