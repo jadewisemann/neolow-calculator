@@ -1,71 +1,77 @@
-
-let
-  display = document.getElementById("calc-result"),
+let display = document.getElementById("calc-result"),
   currentInput = "",
   operator = "",
   previousInput = "";
 
 const buttons = document.querySelectorAll(".calc-button");
 
-buttons.forEach(button => {
-  button.addEventListener("click", () => {
-    const value = button.getAttribute("data-value");
+const updateDisplay = (value) => {
+  display.textContent = value || "0";
+};
 
-    if (value === "ac") {
-      currentInput = "";
-      previousInput = "";
-      operator = "";
-      display.textContent = "0";
-    } else if ( value === "=" && operator && previousInput !== "" && currentInput !== "") {
-      currentInput = calculate(previousInput, currentInput, operator);
-      display.textContent = currentInput;
-      previousInput = "";
-      operator = "";
-    } else if (["+", "-", "*", "/"].includes(value)) {
-      if (currentInput !== "") {
-        previousInput = currentInput;
-        currentInput = "0";
-        operator = value;
-        display.textContent = "0";
-      }
-    } else if (value === "del") {
-        currentInput !== "0" && currentInput.length > 1 ? (
-        currentInput = currentInput.slice(0, -1),
-        display.textContent = currentInput
-      ) : (
-        currentInput = "",
-        display.textContent = "0"
-      )
-    } else if (currentInput === "0") {
-      currentInput = value;
-    }
-    else {
-      currentInput += value;
-    }
-    
-    display.textContent = currentInput;
-  });
-});
-
-function calculate(a, b, operator) {
-  let result;
+const calculate = (a, b, operator) => {
   a = parseFloat(a);
   b = parseFloat(b);
 
   switch (operator) {
     case "+":
-      result = a + b;
-      break;
+      return (a + b).toString();
     case "-":
-      result = a - b;
-      break;
+      return (a - b).toString();
     case "*":
-      result = a * b;
-      break;
+      return (a * b).toString();
     case "/":
-      result = a / b;
-      break;
+      return b !== 0 ? (a / b).toString() : "Error";
+    default:
+      return "0";
   }
+};
 
-  return result.toString();
-}
+const actions = {
+  ac: () => {
+    currentInput = "";
+    previousInput = "";
+    operator = "";
+    updateDisplay("0");
+  },
+  "=": () => {
+    if (operator && previousInput && currentInput) {
+      currentInput = calculate(previousInput, currentInput, operator);
+      previousInput = "";
+      operator = "";
+    }
+  },
+  del: () => {
+    currentInput = currentInput.length > 1 ? currentInput.slice(0, -1) : "";
+  },
+  operator: (value) => {
+    if (currentInput) {
+      if (previousInput && operator) {
+        previousInput = calculate(previousInput, currentInput, operator);
+      } else {
+        previousInput = currentInput;
+      }
+      currentInput = "";
+      operator = value;
+    }
+  },
+  default: (value) => {
+    currentInput = currentInput === "0" ? value : currentInput + value;
+  },
+};
+
+buttons.forEach((button) => {
+  button.addEventListener("click", () => {
+    const value = button.getAttribute("data-value");
+
+    if (value === "ac" || value === "=" || value === "del") {
+      actions[value]();
+    } else if (["+", "-", "*", "/"].includes(value)) {
+      actions.operator(value);
+    } else {
+      actions.default(value);
+    }
+
+    updateDisplay(currentInput || previousInput || "0");
+  });
+});
