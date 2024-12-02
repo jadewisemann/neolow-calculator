@@ -85,6 +85,7 @@ body * {
 }
 
 .calc-result {
+  user-select: none;
   color: white;
 }
 
@@ -97,6 +98,7 @@ body * {
   justify-content: center;
   align-items: center;
   user-select: none;
+  cursor: pointer;
 }
 
 .calc-button:hover {
